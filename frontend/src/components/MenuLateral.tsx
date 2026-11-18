@@ -1,16 +1,18 @@
 import type { ReactNode } from 'react'
 import { AppShell, Avatar, Box, Burger, Button, Group, NavLink, Stack, Text, ThemeIcon } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconCalendarEvent, IconLogout, IconStethoscope } from '@tabler/icons-react'
+import { IconCalendarEvent, IconLogout, IconStethoscope, IconUsers } from '@tabler/icons-react'
 
 type Props = {
   nome: string
   onSair: () => void
+  abaAtiva?: 'consultas' | 'pacientes'
+  onNavegar?: (aba: 'consultas' | 'pacientes') => void
   children: ReactNode
 }
 
 // Moldura das telas de dentro: menu escuro à esquerda (no celular, atrás do ☰) e o conteúdo no meio
-export function MenuLateral({ nome, onSair, children }: Props) {
+export function MenuLateral({ nome, onSair, abaAtiva = 'consultas', onNavegar, children }: Props) {
   const [menuAberto, { toggle: alternarMenu }] = useDisclosure()
 
   return (
@@ -38,11 +40,22 @@ export function MenuLateral({ nome, onSair, children }: Props) {
           <NavLink
             label="Consultas"
             leftSection={<IconCalendarEvent size={20} stroke={1.75} />}
-            active
+            active={abaAtiva === 'consultas'}
+            onClick={() => onNavegar?.('consultas')}
             variant="filled"
             color="clinica.7"
             c="white"
-            style={{ borderRadius: 8 }}
+            style={{ borderRadius: 8, cursor: 'pointer' }}
+          />
+          <NavLink
+            label="Pacientes"
+            leftSection={<IconUsers size={20} stroke={1.75} />}
+            active={abaAtiva === 'pacientes'}
+            onClick={() => onNavegar?.('pacientes')}
+            variant="filled"
+            color="clinica.7"
+            c="white"
+            style={{ borderRadius: 8, cursor: 'pointer' }}
           />
         </Stack>
 

@@ -12,6 +12,7 @@ import {
 } from "@mantine/core";
 import axios from "axios";
 import { cadastrarSecretario } from "../services/api.ts";
+import { cadastroSecretarioSchema } from "@clinica/shared/secretario";
 
 type Props = {
   onVoltarParaLogin: () => void;
@@ -45,8 +46,34 @@ export function CadastroSecretarioPage({ onVoltarParaLogin }: Props) {
     setErroConfirmarSenha("");
     setSucesso("");
 
+    let temErro = false;
     if (senha !== confirmarSenha) {
       setErroConfirmarSenha("As senhas não conferem");
+      temErro = true;
+    }
+
+    // Fail-fast com Zod antes de chamar a API
+    const validacaoDados = cadastroSecretarioSchema.safeParse({
+      nome,
+      cpf,
+      telefone,
+      email,
+      senha,
+    });
+
+    if (!validacaoDados.success) {
+      for (const erro of validacaoDados.error.issues) {
+        const campo = erro.path[0];
+        if (campo === "nome") setErroNome(erro.message);
+        if (campo === "cpf") setErroCpf(erro.message);
+        if (campo === "telefone") setErroTelefone(erro.message);
+        if (campo === "email") setErroEmail(erro.message);
+        if (campo === "senha") setErroSenha(erro.message);
+      }
+      return;
+    }
+
+    if (temErro) {
       return;
     }
 
